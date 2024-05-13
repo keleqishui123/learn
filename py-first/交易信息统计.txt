@@ -52,9 +52,3 @@ for i1 in range(len(stm)):
 for i2 in range(len(myn)):
     sheet2.write(i2, 2, myn[i2])
 f1.save('.\\交易信息\\交易信息.xlsx')
-
-
-'''a = '筷子  备用V  3098100  早7晚12在线/kz111222888  2023/04/19 22:04:14  ￥140.00 已收款  微信转账'
-pattern = r'(\d{4}-\d{1,2}-\d{1,2}\s\d{1,2}:\d{1,2}:\d{1,2})'
-parts = re.split(r'(\d{4}/\d{1,2}/\d{1,2}\s\d{1,2}:\d{1,2}:\d{1,2})', a)
-print(parts)'''
