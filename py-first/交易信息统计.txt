@@ -1,0 +1,60 @@
+import re
+import os
+from bs4 import BeautifulSoup
+import xlwt
+filePath = '.\\pg'
+a1 = []
+stm = []
+myn = []
+for page in os.listdir(filePath):
+    soup = BeautifulSoup(open('.\\pg\\{}'.format(page), encoding='utf-8'), features='html.parser')
+    # '嫌疑人'
+    d1 = ['已收款  微信转账','恭喜发财，大吉大利查看红包']  # 查询条件--模糊查询,要注意条件内空格
+    user = soup.find_all('div', attrs={'class': "user-group"})  # 嫌疑人所以聊天信息
+    adname = soup.find('span', attrs={'class': "admin-info"})
+    if adname != None:
+        adname = soup.find('span', attrs={'class': "admin-info"}).get_text().split()
+        adname_str = '  '.join(adname)
+        adname_wxh = re.split(r'(\d{4}/\d{1,2}/\d{1,2}\s\s\d{1,2}:\d{1,2}:\d{1,2})', adname_str)  # 嫌疑人好友微信昵称和微信号
+        a1.append('{},{}'.format(page, adname_wxh[0]))
+    else:
+        a1.append('{},{}'.format(page,adname))
+    stm.append('----------')
+    myn.append('----------')
+    for b1 in user:
+        st1 = b1.get_text().split()
+        u1 = '  '.join(st1)
+        for tj1 in d1:
+            if tj1 in u1:
+                parts = re.split(r'(\d{4}/\d{1,2}/\d{1,2}\s\s\d{1,2}:\d{1,2}:\d{1,2})', u1)  # 用时间分割
+                a1.append(parts[0])
+                stm.append(parts[1])
+                myn.append(parts[2])
+    # '嫌疑人好友
+    d = ['已收款  微信转账','恭喜发财，大吉大利查看红包']  # 查询条件--模糊查询,要注意条件内空格
+    admin = soup.find_all('div', attrs={'class': "admin-group"})
+    for b in admin:
+        st = b.get_text().split()
+        u = '  '.join(st)
+        for tj in d:
+            if tj in u:
+                parts1 = re.split(r'(\d{4}/\d{1,2}/\d{1,2}\s\s\d{1,2}:\d{1,2}:\d{1,2})', u)
+                a1.append(parts1[0])
+                stm.append(parts1[1])
+                myn.append(parts1[2])
+#创建excel
+f1 = xlwt.Workbook('encoding = utf-8')
+sheet2 = f1.add_sheet('Sheet1', cell_overwrite_ok=True)
+for i in range(len(a1)):
+    sheet2.write(i, 0, a1[i])
+for i1 in range(len(stm)):
+    sheet2.write(i1, 1, stm[i1])
+for i2 in range(len(myn)):
+    sheet2.write(i2, 2, myn[i2])
+f1.save('.\\交易信息\\交易信息.xlsx')
+
+
+'''a = '筷子  备用V  3098100  早7晚12在线/kz111222888  2023/04/19 22:04:14  ￥140.00 已收款  微信转账'
+pattern = r'(\d{4}-\d{1,2}-\d{1,2}\s\d{1,2}:\d{1,2}:\d{1,2})'
+parts = re.split(r'(\d{4}/\d{1,2}/\d{1,2}\s\d{1,2}:\d{1,2}:\d{1,2})', a)
+print(parts)'''

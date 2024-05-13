@@ -1,0 +1,12 @@
+import os
+import xlwt
+filePath = 'D:\\py\\pg'
+os.listdir(filePath)
+k = []
+for page in os.listdir(filePath):
+    k.append(page)
+f1 = xlwt.Workbook('encoding = utf-8')
+sheet2 = f1.add_sheet('Sheet1', cell_overwrite_ok=True)
+for i1 in range(len(k)):
+    sheet2.write(i1, 0, k[i1])
+f1.save('.\\页码\\好友聊天页码.xlsx')

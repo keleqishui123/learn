@@ -1,0 +1,30 @@
+from openpyxl import load_workbook
+import xlwt
+# 读取所有好友聊天页码
+wb = load_workbook(".\\页码\\好友聊天页码.xlsx")
+ws = wb['Sheet1']  # Work Sheet
+column = ws['A']  # Column
+mylist = [column[x].value for x in range(len(column))]
+wb.close()
+# 读取有转账记录页码
+wb1 = load_workbook("D:\\py\\页码\\有转账页码.xlsx")
+ws1 = wb1['Sheet1']  # Work Sheet
+column1 = ws1['A']  # Column
+mylist1 = [column1[x1].value for x1 in range(len(column1))]
+wb1.close()
+# 输出要截图的页码
+k = []
+for a in mylist:
+    a1 = a.split('_')[1]
+    a2 = a1.split('.')[0]
+    for b in mylist1:
+        b1 = b.split('_')[1]
+        b2 = b1.split('.')[0]
+        if b2 == a2:
+            k.append(a)
+            break
+f = xlwt.Workbook('encoding = utf-8')
+sheet1 = f.add_sheet('Sheet1', cell_overwrite_ok=True)
+for i in range(len(k)):
+    sheet1.write(i, 0, k[i])
+f.save('D:\\py\\页码\\截图页码.xlsx')

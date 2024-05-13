@@ -1,0 +1,68 @@
+from openpyxl import load_workbook
+import json
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from time import sleep
+from bs4 import BeautifulSoup
+import string
+import os
+wb = load_workbook("D:\\py\\页码\\截图页码.xlsx")  # 要截图的页码文件
+ws = wb['Sheet1']  # Work Sheet
+column = ws['A']  # Column
+mylist = [column[x].value for x in range(len(column))]
+wb.close()
+
+for d in mylist:
+    chrome_options = webdriver.ChromeOptions()
+    settings = {
+        "recentDestinations": [{
+            "id": "Save as PDF",
+            "origin": "local",
+            "account": ""
+        }],
+        "selectedDestinationId": "Save as PDF",
+        "version": 2,
+        "isHeaderFooterEnabled": False,
+
+        "customMargins": {},
+        "marginsType": 2,  # 边距（2是最小值、0是默认）
+        "scaling": 100,
+        "scalingType": 3,
+        "scalingTypePdf": 3,
+        "isLandscapeEnabled": False,  # 若不设置该参数，默认值为纵向
+        "isCssBackgroundEnabled": True,
+        "mediaSize": {
+            "height_microns": 297000,
+            "name": "ISO_A4",
+            "width_microns": 210000,
+            "custom_display_name": "A4"
+        },
+    }
+
+    chrome_options.add_argument('--enable-print-browser')
+    #  chrome_options.add_argument('--headless')  # headless模式下，浏览器窗口不可见，可提高效率
+    prefs = {
+        'printing.print_preview_sticky_settings.appState': json.dumps(settings),
+        'savefile.default_directory': 'D:\\py\\截图'  # 此处填写你希望文件保存的路径,可填写your file path默认下载地址
+    }
+
+    chrome_options.add_argument('--kiosk-printing')  # 静默打印，无需用户点击打印页面的确定按钮
+    chrome_options.add_experimental_option('prefs', prefs)
+    service = Service(executable_path="D:\py\chromedriver.exe")  # 谷歌浏览器驱动路径
+    chrome_options.binary_location = "D:\Chrome\Application\chrome.exe"
+    driver = webdriver.Chrome(service=service, options=chrome_options)
+    soup = BeautifulSoup(open('D:\py\pg\***华为p40p_20240402083249\Reports\%s' % (d), encoding='utf-8'), features='html.parser')  # 报告Reports内文件所在路径
+    adname = soup.find('span', attrs={'class': "admin-info"})
+    if adname != None:
+        adnamet = adname.get_text().split()
+    else:
+        adnamet = '%s'%(d)
+    adnamets = str(adnamet)
+    out = "".join([i for i in adnamets if i not in string.punctuation])
+
+    driver.get('D:\\py\\pg\\***为p40p_20240402083249\\Reports\\%s'%(d))
+    driver.maximize_window()  # 浏览器最大化
+    js = 'document.title="{}.pdf";window.print();'.format(out)
+    driver.execute_script(js)
+    sleep(3)
+    driver.quit()

@@ -1,0 +1,36 @@
+from openpyxl import load_workbook
+from bs4 import BeautifulSoup
+import os
+import xlwt
+wb = load_workbook("D:\\py\\微信号\\微信号.xlsx")  # Work Book
+ws = wb['Sheet1']  # Work Sheet
+column = ws['A']  # Column
+mylist = [column[x].value for x in range(len(column))]
+ID = []
+filePath = 'D:\\py\\pg-wxid'
+for page in os.listdir(filePath):
+    soup = BeautifulSoup(open('D:\\py\\pg-wxid\\{}'.format(page), encoding='utf-8'), features='html.parser')
+    for d in mylist:
+        a = soup.find('td', string="{}".format(d))
+        if a is None:
+            continue
+        else:
+            a1 = a.find_previous_siblings()
+            if len(a1) == 2:
+                a2 = a1[1]
+                for b in a2:
+                    b1 = b.get_text() + ',' + str(d)
+                    ID.append(b1)
+            else:
+                continue
+# 按照交交易表顺序从新排序
+ID_ypx = []
+for d1 in mylist:
+    for ID_px in ID:
+        if str(d1) in ID_px:
+            ID_ypx.append(ID_px)
+f = xlwt.Workbook('encoding = utf-8')
+sheet = f.add_sheet('Sheet1', cell_overwrite_ok=True)
+for i in range(len(ID_ypx)):
+    sheet.write(i, 0, ID_ypx[i])
+f.save('D:\\py\\微信号\\微信ID.xlsx')
